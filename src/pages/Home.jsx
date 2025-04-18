@@ -1,41 +1,46 @@
-export default function Home() {
+import { Helmet } from 'react-helmet';
+
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-[#fefefe] text-[#1a1a1a] px-4 py-10">
-      <div className="max-w-5xl mx-auto">
-        <header className="text-center mb-12">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-2">Greeting Card Genius</h1>
-          <p className="text-lg text-gray-600">AI-generated cards for every moment — sarcastic, sweet, or just plain weird.</p>
-        </header>
+    <main className="min-h-screen bg-[#0c0c1d] text-white px-6 py-12">
+      <Helmet>
+        <title>Greeting Card Genius – AI-Designed Cards</title>
+        <meta name="description" content="AI-generated greeting cards for every occasion — sweet, savage, or hilarious. Drop your message. We'll handle the magic." />
+        <meta property="og:image" content="/og-greetingcardgenius.jpg" />
+      </Helmet>
 
-        <section className="mb-16">
-          <h2 className="text-2xl font-semibold mb-4">🎉 Featured Cards</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <div className="bg-white p-4 rounded-xl border shadow-sm">
-              <img src="/cards/funny-birthday-1.png" alt="Funny Birthday Card" className="rounded mb-2" />
-              <h3 className="font-bold text-lg">Funny Birthday Card</h3>
-              <p className="text-sm text-gray-500">AU$2.00</p>
-              <button className="mt-2 px-4 py-1 bg-black text-white rounded">Buy Now</button>
-            </div>
-            <div className="bg-white p-4 rounded-xl border shadow-sm">
-              <img src="/cards/breakup-sarcasm.png" alt="Breakup Card" className="rounded mb-2" />
-              <h3 className="font-bold text-lg">Breakup Sarcasm</h3>
-              <p className="text-sm text-gray-500">AU$2.00</p>
-              <button className="mt-2 px-4 py-1 bg-black text-white rounded">Buy Now</button>
-            </div>
-            <div className="bg-white p-4 rounded-xl border shadow-sm">
-              <img src="/cards/pet-love.png" alt="Pet Love Card" className="rounded mb-2" />
-              <h3 className="font-bold text-lg">Pet Love</h3>
-              <p className="text-sm text-gray-500">AU$2.00</p>
-              <button className="mt-2 px-4 py-1 bg-black text-white rounded">Buy Now</button>
-            </div>
-          </div>
-        </section>
+      <div className="max-w-4xl mx-auto text-center space-y-10">
+        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-500">
+          🧠 Greeting Card Genius
+        </h1>
+        <p className="text-lg text-gray-300">
+          AI-designed greeting cards for every occasion — sweet, savage, or hilarious. Drop your message. We'll handle the magic.
+        </p>
 
-        <section className="bg-[#fffae6] text-center p-6 rounded-xl border border-yellow-300">
-          <h2 className="text-2xl font-semibold mb-2">🚀 More Cards Dropping Weekly</h2>
-          <p className="text-gray-700">From sarcastic roast packs to heartfelt originals — we’ve got AI-powered greetings for whatever life throws at you.</p>
-        </section>
+        <div className="rounded-xl border border-yellow-400 p-6 bg-[#1c1c2b] text-left shadow-lg">
+          <h2 className="text-2xl font-bold text-yellow-300 mb-3">Coming Soon</h2>
+          <p className="text-gray-400">We're finalizing the collection and testing direct checkout. Be first in line for exclusive drops, discounts, and early access.</p>
+
+          <form className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+            <input
+              type="email"
+              placeholder="Your email"
+              className="px-4 py-2 rounded-md w-full sm:w-80 text-black"
+            />
+            <button
+              type="submit"
+              disabled
+              className="bg-yellow-500 text-black px-5 py-2 rounded-md cursor-not-allowed"
+            >
+              Notify Me
+            </button>
+          </form>
+        </div>
+
+        <div className="pt-10 text-sm text-gray-500">
+          Powered by <strong>QUANTUMNOVA</strong> · Custom Airwallex checkout coming soon
+        </div>
       </div>
-    </div>
+    </main>
   );
 }
