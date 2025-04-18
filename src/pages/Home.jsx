@@ -3,6 +3,17 @@ import { Helmet } from 'react-helmet';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 
+<Helmet>
+  <title>Greeting Card Genius – AI-Designed Cards</title>
+  <meta name="description" content="AI-generated greeting cards that are sweet, savage, or hilarious. Designed by QUANTUMNOVA." />
+  <meta name="keywords" content="AI greeting cards, funny cards, savage cards, QUANTUMNOVA, handmade cards, digital cards, birthday, romantic, rude cards" />
+  <meta property="og:title" content="Greeting Card Genius – AI-Designed Cards" />
+  <meta property="og:description" content="Sweet, savage, or just plain weird — get custom AI-designed cards from QUANTUMNOVA." />
+  <meta property="og:image" content="/og-greetingcardgenius.jpg" />
+  <meta property="og:url" content="https://greetingcardgenius.com.au" />
+  <meta name="twitter:card" content="summary_large_image" />
+</Helmet>
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#0c0c1d] text-white px-6 py-12">
