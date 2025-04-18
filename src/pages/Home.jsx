@@ -1,16 +1,36 @@
-import { Helmet } from 'react-helmet';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import './index.css'; 
+
+import HomePage from './pages/Home';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
+import Refunds from './pages/Refunds';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/refunds" element={<Refunds />} />
+      </Routes>
+    </BrowserRouter>
+  </React.StrictMode>
+);
 
 function Header() {
   return (
-    <header className="flex justify-between items-center px-6 pt-6">
-      <h1 className="text-2xl font-bold text-yellow-400">Greeting Card Genius</h1>
-      <div className="space-x-4 text-sm">
-        <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400">Instagram</a>
-        <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400">Facebook</a>
-        <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400">X</a>
-      </div>
-    </header>
+    <header className="text-center py-6 space-y-2">
+  <h1 className="text-2xl font-bold text-yellow-400">Greeting Card Genius</h1>
+  <div className="space-x-4 text-sm flex justify-center">
+    <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400">Instagram</a>
+    <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400">Facebook</a>
+    <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400">X</a>
+  </div>
+</header>
   );
 }
 
@@ -42,9 +62,6 @@ export default function HomePage() {
       <Header />
 
       <div className="max-w-4xl mx-auto text-center space-y-10">
-        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-500">
-          🧠 Greeting Card Genius
-        </h1>
         <p className="text-lg text-gray-300">
           AI-designed greeting cards for every occasion — sweet, savage, or hilarious. Drop your message. We'll handle the magic.
         </p>
