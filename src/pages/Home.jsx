@@ -1,54 +1,7 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './index.css'; 
-
-import HomePage from './pages/Home';
-import Terms from './pages/Terms';
-import Privacy from './pages/Privacy';
-import Refunds from './pages/Refunds';
-
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/refunds" element={<Refunds />} />
-      </Routes>
-    </BrowserRouter>
-  </React.StrictMode>
-);
-
-function Header() {
-  return (
-    <header className="text-center py-6 space-y-2">
-  <h1 className="text-2xl font-bold text-yellow-400">Greeting Card Genius</h1>
-  <div className="space-x-4 text-sm flex justify-center">
-    <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400">Instagram</a>
-    <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400">Facebook</a>
-    <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer" className="text-white hover:text-yellow-400">X</a>
-  </div>
-</header>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="bg-[#0c0c1d] text-gray-400 text-sm py-6 px-4 text-center border-t border-gray-800">
-      <div className="max-w-4xl mx-auto space-y-2">
-        <div className="space-x-4">
-          <Link to="/terms" className="hover:underline text-white">Terms</Link>
-          <Link to="/privacy" className="hover:underline text-white">Privacy</Link>
-          <Link to="/refunds" className="hover:underline text-white">Refunds</Link>
-          <a href="mailto:admin@quantumnova.com.au" className="hover:underline text-white">Contact</a>
-        </div>
-        <p className="mt-2">&copy; 2025 QUANTUMNOVA PTY LTD — All rights reserved.</p>
-      </div>
-    </footer>
-  );
-}
+import { Helmet } from 'react-helmet';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 export default function HomePage() {
   return (
