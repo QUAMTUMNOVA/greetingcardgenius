@@ -14,6 +14,22 @@ function Header() {
   );
 }
 
+function Footer() {
+  return (
+    <footer className="bg-[#0c0c1d] text-gray-400 text-sm py-6 px-4 text-center border-t border-gray-800">
+      <div className="max-w-4xl mx-auto space-y-2">
+        <div className="space-x-4">
+          <Link to="/terms" className="hover:underline text-white">Terms</Link>
+          <Link to="/privacy" className="hover:underline text-white">Privacy</Link>
+          <Link to="/refunds" className="hover:underline text-white">Refunds</Link>
+          <a href="mailto:admin@quantumnova.com.au" className="hover:underline text-white">Contact</a>
+        </div>
+        <p className="mt-2">&copy; 2025 QUANTUMNOVA PTY LTD — All rights reserved.</p>
+      </div>
+    </footer>
+  );
+}
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#0c0c1d] text-white px-6 py-12">
@@ -22,6 +38,8 @@ export default function HomePage() {
         <meta name="description" content="AI-generated greeting cards for every occasion — sweet, savage, or hilarious. Drop your message. We'll handle the magic." />
         <meta property="og:image" content="/og-greetingcardgenius.jpg" />
       </Helmet>
+
+      <Header />
 
       <div className="max-w-4xl mx-auto text-center space-y-10">
         <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-pink-500">
@@ -50,25 +68,13 @@ export default function HomePage() {
             </button>
           </form>
         </div>
-  
-  return (
-        <footer className="bg-[#0c0c1d] text-gray-400 text-sm py-6 px-4 text-center border-t border-gray-800">
-        <div className="max-w-4xl mx-auto space-y-2">
-          <div className="space-x-4">
-          <Link to="/terms" className="hover:underline text-white">Terms</Link>
-          <Link to="/privacy" className="hover:underline text-white">Privacy</Link>
-          <Link to="/refunds" className="hover:underline text-white">Refunds</Link>
-          <a href="mailto:admin@quantumnova.com.au" className="hover:underline text-white">Contact</a>
-        </div>
-        <p className="mt-2">&copy; 2025 QUANTUMNOVA PTY LTD — All rights reserved.</p>
-      </div>
-    </footer>
-  );
-}
+
         <div className="pt-10 text-sm text-gray-500">
           Powered by <strong>QUANTUMNOVA</strong> · Custom Airwallex checkout coming soon
         </div>
       </div>
+
+      <Footer />
     </main>
   );
 }
