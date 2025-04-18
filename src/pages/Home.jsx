@@ -50,7 +50,6 @@ export default function HomePage() {
             </button>
           </form>
         </div>
-        export default function Footer() {
   
   return (
         <footer className="bg-[#0c0c1d] text-gray-400 text-sm py-6 px-4 text-center border-t border-gray-800">
