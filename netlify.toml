@@ -1,7 +1,4 @@
 [functions]
 directory = "netlify/functions"
-included_files = ["valid-tokens.json"]
+included_files = ["netlify/functions/valid-tokens.json"]
 node_bundler = "esbuild"
-
-[functions."*"]
-blob = true

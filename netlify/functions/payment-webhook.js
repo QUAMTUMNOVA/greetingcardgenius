@@ -1,5 +1,8 @@
-const { getStore } = require('@netlify/blobs');
+const fs = require('fs');
+const path = require('path');
 const crypto = require('crypto');
+
+const FILE_PATH = path.join(__dirname, 'valid-tokens.json');
 
 function generateToken() {
   return crypto.randomBytes(5).toString('base64url').toUpperCase();
@@ -7,36 +10,30 @@ function generateToken() {
 
 exports.handler = async function (event) {
   try {
-    const blobKey = 'valid-tokens.json';
-    const store = getStore({ name: 'token-store' });
-
+    const token = generateToken();
     let current = [];
+
     try {
-      current = await store.get(blobKey, { type: 'json' }) || [];
-    } catch (e) {
-      console.warn("⚠️ No existing token file. Creating new.");
+      const raw = fs.readFileSync(FILE_PATH, 'utf-8');
+      current = JSON.parse(raw);
+    } catch {
+      console.warn('⚠️ Token file not found, creating new.');
     }
 
-    const token = generateToken();
-    const updatedTokens = [...current, token];
+    const updated = [...current, token];
+    fs.writeFileSync(FILE_PATH, JSON.stringify(updated, null, 2));
 
-    await store.set(blobKey, updatedTokens, {
-      metadata: { updated: new Date().toISOString() },
-    });
-
-    console.log("✅ Payment succeeded");
-    console.log("🔐 Generated token:", token);
-    console.log("🧠 Valid tokens list now contains:", updatedTokens);
+    console.log("✅ Token created:", token);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Token saved', token }),
+      body: JSON.stringify({ message: 'Token created', token }),
     };
   } catch (err) {
-    console.error("❌ Failed to handle Airwallex webhook", err);
+    console.error("❌ Failed to handle webhook:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to handle Airwallex webhook.' }),
+      body: JSON.stringify({ error: 'Webhook error' }),
     };
   }
 };

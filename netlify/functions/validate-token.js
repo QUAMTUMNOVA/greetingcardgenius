@@ -1,32 +1,36 @@
-const { getStore } = require('@netlify/blobs');
+const fs = require('fs');
+const path = require('path');
+
+const FILE_PATH = path.join(__dirname, 'valid-tokens.json');
 
 exports.handler = async function (event) {
   const token = event.queryStringParameters?.token;
+
   if (!token) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'Missing token' }),
+      body: JSON.stringify({ error: 'Token missing' }),
     };
   }
 
   try {
-    const store = getStore({ name: 'token-store' });
-    const blobKey = 'valid-tokens.json';
-    const validTokens = await store.get(blobKey, { type: 'json' }) || [];
+    const raw = fs.readFileSync(FILE_PATH, 'utf-8');
+    const tokens = JSON.parse(raw);
 
-    const isValid = validTokens.includes(token);
+    const isValid = tokens.includes(token);
+
     return {
       statusCode: isValid ? 200 : 403,
       body: JSON.stringify({
         valid: isValid,
-        message: isValid ? 'Token is valid' : 'Invalid or expired token',
+        message: isValid ? 'Token is valid' : 'Token invalid or expired',
       }),
     };
   } catch (err) {
-    console.error("❌ Failed to validate token", err);
+    console.error("❌ Token validation failed:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Validation failed' }),
+      body: JSON.stringify({ error: 'Token validation failed' }),
     };
   }
 };
