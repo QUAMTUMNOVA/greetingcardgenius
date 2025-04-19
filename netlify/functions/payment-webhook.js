@@ -1,13 +1,15 @@
+const fetch = require('node-fetch'); // polyfill
+global.fetch = fetch;
+
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
 
-// ✅ Debug logs for env variables
 console.log("🔐 Supabase URL:", process.env.SUPABASE_URL);
 console.log("🔐 Supabase Service Role Key Present:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY // make sure this is set in Netlify
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 exports.handler = async function (event) {
@@ -16,7 +18,7 @@ exports.handler = async function (event) {
 
     const { error } = await supabase
       .from('tokens')
-      .insert([{ token }]); // make sure this matches the column name
+      .insert([{ token }]);
 
     if (error) {
       console.error("❌ Supabase insert failed", error.message, error.details);
