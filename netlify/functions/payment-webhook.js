@@ -1,4 +1,5 @@
-const { blobs } = require('@netlify/blobs');
+const fs = require('fs');
+const path = '/tmp/valid-tokens.json';
 const crypto = require('crypto');
 
 function generateToken() {
@@ -7,20 +8,18 @@ function generateToken() {
 
 exports.handler = async function () {
   try {
-    const store = blobs.getStore('tokens');
-    const token = generateToken();
+    let validTokens = [];
 
-    let current = [];
-    try {
-      const { data } = await store.get('valid.json');
-      current = JSON.parse(data || '[]');
-    } catch (err) {
-      console.warn("⚠️ No existing token file. Creating new.");
+    if (fs.existsSync(path)) {
+      validTokens = JSON.parse(fs.readFileSync(path, 'utf8'));
     }
 
-    const updated = [...current, token];
-    await store.set('valid.json', JSON.stringify(updated));
+    const token = generateToken();
+    validTokens.push(token);
 
+    fs.writeFileSync(path, JSON.stringify(validTokens));
+
+    console.log("✅ Token created:", token);
     return {
       statusCode: 200,
       body: JSON.stringify({ message: 'Token created', token }),
@@ -29,7 +28,7 @@ exports.handler = async function () {
     console.error("❌ Failed to handle webhook", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'webhook error' }),
+      body: JSON.stringify({ error: 'Webhook error' }),
     };
   }
 };
