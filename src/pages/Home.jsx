@@ -2,7 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import BuyCardButton from '..BuyCardButton/components/BuyCardButton';
+import BuyCardButton from '../components/BuyCardButton';
 
 <Helmet>
   <title>Greeting Card Genius – AI-Designed Cards</title>
