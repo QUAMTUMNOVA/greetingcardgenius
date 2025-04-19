@@ -1,22 +1,25 @@
 const fs = require('fs');
-
-const FILE_PATH = '/tmp/valid-tokens.json';
+const path = require('path');
 
 exports.handler = async function (event) {
   const token = event.queryStringParameters?.token;
+  const tokenPath = path.join('/tmp', 'valid-tokens.json');
 
   if (!token) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'Token missing' }),
+      body: JSON.stringify({ error: 'Missing token' }),
     };
   }
 
   try {
-    const raw = fs.readFileSync(FILE_PATH, 'utf-8');
-    const tokens = JSON.parse(raw);
+    let validTokens = [];
+    if (fs.existsSync(tokenPath)) {
+      const data = fs.readFileSync(tokenPath, 'utf-8');
+      validTokens = JSON.parse(data);
+    }
 
-    const isValid = tokens.includes(token);
+    const isValid = validTokens.includes(token);
 
     return {
       statusCode: isValid ? 200 : 403,
@@ -26,10 +29,10 @@ exports.handler = async function (event) {
       }),
     };
   } catch (err) {
-    console.error("❌ Token validation failed:", err);
+    console.error("❌ Failed to validate token", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Token validation failed' }),
+      body: JSON.stringify({ error: 'Validation failed' }),
     };
   }
 };
