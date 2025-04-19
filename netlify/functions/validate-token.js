@@ -1,9 +1,8 @@
 const fs = require('fs');
-const path = '/tmp/valid-tokens.json';
+const path = require('path');
 
 exports.handler = async function (event) {
   const token = event.queryStringParameters?.token;
-
   if (!token) {
     return {
       statusCode: 400,
@@ -12,14 +11,11 @@ exports.handler = async function (event) {
   }
 
   try {
-    let validTokens = [];
-
-    if (fs.existsSync(path)) {
-      validTokens = JSON.parse(fs.readFileSync(path, 'utf8'));
-    }
+    const tokensPath = path.resolve(__dirname, '../data/valid-tokens.json');
+    const data = fs.readFileSync(tokensPath, 'utf8');
+    const validTokens = JSON.parse(data);
 
     const isValid = validTokens.includes(token);
-
     return {
       statusCode: isValid ? 200 : 403,
       body: JSON.stringify({
@@ -28,7 +24,7 @@ exports.handler = async function (event) {
       }),
     };
   } catch (err) {
-    console.error("❌ Validation failed", err);
+    console.error("❌ Failed to validate token", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Validation error' }),
