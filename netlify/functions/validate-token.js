@@ -1,4 +1,4 @@
-const blobs = require('@netlify/blobs');
+const { getStore } = require('@netlify/blobs');
 
 exports.handler = async function (event) {
   const token = event.queryStringParameters?.token;
@@ -10,8 +10,9 @@ exports.handler = async function (event) {
   }
 
   try {
+    const store = getStore({ name: 'token-store' });
     const blobKey = 'valid-tokens.json';
-    const validTokens = await blobs.read(blobKey, { encoding: 'json' }) || [];
+    const validTokens = await store.get(blobKey, { type: 'json' }) || [];
 
     const isValid = validTokens.includes(token);
     return {
