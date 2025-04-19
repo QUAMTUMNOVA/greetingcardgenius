@@ -1,10 +1,7 @@
-const fs = require('fs');
-const path = require('path');
+const { blobs } = require('@netlify/blobs');
 
 exports.handler = async function (event) {
   const token = event.queryStringParameters?.token;
-  const tokenPath = path.join('/tmp', 'valid-tokens.json');
-
   if (!token) {
     return {
       statusCode: 400,
@@ -13,23 +10,20 @@ exports.handler = async function (event) {
   }
 
   try {
-    let validTokens = [];
-    if (fs.existsSync(tokenPath)) {
-      const data = fs.readFileSync(tokenPath, 'utf-8');
-      validTokens = JSON.parse(data);
-    }
+    const store = blobs.getStore('tokens');
+    const { data } = await store.get('valid.json');
+    const tokens = JSON.parse(data || '[]');
 
-    const isValid = validTokens.includes(token);
-
+    const valid = tokens.includes(token);
     return {
-      statusCode: isValid ? 200 : 403,
+      statusCode: valid ? 200 : 403,
       body: JSON.stringify({
-        valid: isValid,
-        message: isValid ? 'Token is valid' : 'Invalid or expired token',
+        valid,
+        message: valid ? 'Token is valid' : 'Invalid or expired token',
       }),
     };
   } catch (err) {
-    console.error("❌ Failed to validate token", err);
+    console.error("❌ Validation error", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: 'Validation failed' }),
