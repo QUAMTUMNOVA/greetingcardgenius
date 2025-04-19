@@ -12,7 +12,7 @@ exports.handler = async function (event) {
 
     const { error } = await supabase
       .from('tokens')
-      .insert([{ token }]); // match your column name here
+      .insert([{ token }]) // ✅ matches your Supabase column name
 
     if (error) {
       console.error("❌ Supabase insert failed", error);
