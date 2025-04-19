@@ -1,4 +1,4 @@
-import { read } from '@netlify/blobs';
+const { write, list } = require('@netlify/blobs');
 
 export async function handler(event) {
   try {
