@@ -2,7 +2,7 @@ const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY // 🔑 Use service role key!
 );
 
 exports.handler = async function (event) {
@@ -17,8 +17,16 @@ exports.handler = async function (event) {
   const { data, error } = await supabase
     .from('tokens')
     .select('*')
-    .eq('value', token)
+    .eq('token', token) // 🔄 Also make sure the column name is `token`
     .maybeSingle();
+
+  if (error) {
+    console.error("❌ Token validation error:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Validation failed' }),
+    };
+  }
 
   const isValid = !!data;
 
