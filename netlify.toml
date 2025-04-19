@@ -1,6 +1,5 @@
 [functions]
-  directory = "netlify/functions"
-  node_bundler = "esbuild"
+directory = "netlify/functions"
 
 [functions."*"]
-  blob = true
+blob = true
