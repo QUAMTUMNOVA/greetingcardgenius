@@ -1,33 +1,32 @@
-import { read } from '@netlify/blobs';
+const { read } = require('@netlify/blobs');
 
-export async function handler(event) {
-  const url = new URL(event.rawUrl);
-  const token = url.searchParams.get('token');
-
+exports.handler = async function (event) {
+  const token = event.queryStringParameters?.token;
   if (!token) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: 'No token provided' }),
+      body: JSON.stringify({ error: 'Missing token' }),
     };
   }
 
   try {
-    const blob = await read(`valid-tokens/${token}.json`, {
-      encoding: 'json'
-    });
+    const blobKey = 'valid-tokens.json';
+    const res = await fetch(`/.netlify/blobs/${blobKey}`);
+    const validTokens = res.ok ? await res.json() : [];
 
-    if (blob && blob.valid) {
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ success: true }),
-      };
-    } else {
-      throw new Error("Token not found or invalid");
-    }
-  } catch (err) {
+    const isValid = validTokens.includes(token);
     return {
-      statusCode: 403,
-      body: JSON.stringify({ success: false, error: 'Invalid or expired token' }),
+      statusCode: isValid ? 200 : 403,
+      body: JSON.stringify({
+        valid: isValid,
+        message: isValid ? 'Token is valid' : 'Invalid or expired token',
+      }),
+    };
+  } catch (err) {
+    console.error("❌ Failed to validate token", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Validation failed' }),
     };
   }
-}
+};
