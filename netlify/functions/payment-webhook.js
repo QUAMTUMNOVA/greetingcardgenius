@@ -1,4 +1,4 @@
-const { write } = require('@netlify/blobs');
+const { read, write } = require('@netlify/blobs');
 const crypto = require('crypto');
 
 function generateToken() {

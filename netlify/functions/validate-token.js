@@ -1,4 +1,4 @@
-const { read } = require('@netlify/blobs');
+const { read, write } = require('@netlify/blobs');
 
 exports.handler = async function (event) {
   const token = event.queryStringParameters?.token;
