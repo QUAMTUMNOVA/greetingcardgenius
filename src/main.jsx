@@ -7,6 +7,8 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Refunds from './pages/Refunds';
 import './index.css';
+import Success from './pages/Success';
+
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
