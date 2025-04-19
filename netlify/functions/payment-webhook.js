@@ -1,4 +1,4 @@
-const { read, write } = require('@netlify/blobs');
+const blobs = require('@netlify/blobs');
 const crypto = require('crypto');
 
 function generateToken() {
@@ -10,20 +10,17 @@ exports.handler = async function (event) {
     const blobKey = 'valid-tokens.json';
     const token = generateToken();
 
-    // Fetch existing token list
+    // Fetch existing tokens using Netlify Blob API
     let current = [];
     try {
-      const res = await fetch(`/.netlify/blobs/${blobKey}`);
-      if (res.ok) {
-        current = await res.json();
-      }
+      current = await blobs.read(blobKey, { encoding: 'json' }) || [];
     } catch (e) {
-      console.warn("No existing token file. Creating new.");
+      console.warn("⚠️ No existing token file. Creating new.");
     }
 
-    // Save updated token list
+    // Append token
     const updatedTokens = [...current, token];
-    await write(blobKey, JSON.stringify(updatedTokens), {
+    await blobs.write(blobKey, JSON.stringify(updatedTokens), {
       contentType: 'application/json',
     });
 
