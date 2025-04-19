@@ -3,7 +3,7 @@ const crypto = require('crypto');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
 exports.handler = async function (event) {
@@ -12,7 +12,7 @@ exports.handler = async function (event) {
 
     const { error } = await supabase
       .from('tokens')
-      .insert([{ value: token }]);
+      .insert([{ token }]); // match your column name here
 
     if (error) {
       console.error("❌ Supabase insert failed", error);
