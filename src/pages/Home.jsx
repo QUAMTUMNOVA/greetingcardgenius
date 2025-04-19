@@ -26,8 +26,6 @@ export default function HomePage() {
 
       <Header />
 
-      <BuyCardButton />
-
       <div className="max-w-4xl mx-auto text-center space-y-10">
         <p className="text-lg text-gray-300">
           AI-designed greeting cards for every occasion — sweet, savage, or hilarious. Drop your message. We'll handle the magic.
