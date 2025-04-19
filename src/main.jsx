@@ -16,6 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/refunds" element={<Refunds />} />
+        <Route path="/success" element={<Success />} />
       </Routes>
     </Router>
   </React.StrictMode>
