@@ -1,6 +1,10 @@
 const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
 
+// ✅ Debug logs for env variables
+console.log("🔐 Supabase URL:", process.env.SUPABASE_URL);
+console.log("🔐 Supabase Service Role Key Present:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY // make sure this is set in Netlify
