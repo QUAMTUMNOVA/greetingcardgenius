@@ -22,7 +22,7 @@ exports.handler = async function (event) {
       statusCode: isValid ? 200 : 403,
       body: JSON.stringify({
         valid: isValid,
-        message: isValid ? 'Token is valid' : 'Token invalid or expired',
+        message: isValid ? 'Token is valid' : 'Invalid or expired token',
       }),
     };
   } catch (err) {
