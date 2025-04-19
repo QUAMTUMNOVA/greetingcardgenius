@@ -1,48 +1,25 @@
-const fs = require('fs');
-const path = require('path');
-
-const TOKEN_FILE = path.resolve(__dirname, 'tokens.json');
-
-// Load existing tokens
-function loadTokens() {
-  try {
-    const data = fs.readFileSync(TOKEN_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-// Save updated tokens
-function saveTokens(tokens) {
-  fs.writeFileSync(TOKEN_FILE, JSON.stringify(tokens, null, 2));
-}
+const { validTokens } = require("./payment-webhook");
 
 exports.handler = async function (event) {
-  const { token } = event.queryStringParameters;
+  try {
+    const token = event.queryStringParameters?.token;
 
-  if (!token) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Missing token' }),
-    };
-  }
+    if (validTokens.has(token)) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ valid: true }),
+      };
+    }
 
-  const tokens = loadTokens();
-
-  if (!tokens.includes(token)) {
     return {
       statusCode: 403,
-      body: JSON.stringify({ error: 'Invalid or expired token' }),
+      body: JSON.stringify({ valid: false }),
+    };
+  } catch (err) {
+    console.error("❌ Failed to validate token:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Token validation failed" }),
     };
   }
-
-  // Optional: remove token after use to prevent reuse
-  const updatedTokens = tokens.filter((t) => t !== token);
-  saveTokens(updatedTokens);
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ valid: true }),
-  };
 };

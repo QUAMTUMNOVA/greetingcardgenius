@@ -1,57 +1,45 @@
-const fs = require('fs');
-const path = require('path');
-
-const TOKEN_FILE = path.resolve(__dirname, 'tokens.json');
-
-// Util: generate random 6-character token
-function generateToken(length = 6) {
-  return Math.random().toString(36).substring(2, 2 + length).toUpperCase();
-}
-
-// Load existing tokens
-function loadTokens() {
-  try {
-    const data = fs.readFileSync(TOKEN_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-// Save tokens
-function saveTokens(tokens) {
-  fs.writeFileSync(TOKEN_FILE, JSON.stringify(tokens, null, 2));
-}
+let validTokens = new Set(); // Temporary in-memory storage
 
 exports.handler = async function (event) {
   try {
-    const body = JSON.parse(event.body || '{}');
+    const body = JSON.parse(event.body);
 
-    if (body.name !== 'payment_intent.succeeded') {
+    // Confirm it's a successful payment
+    const isSuccess =
+      body?.name === "payment_intent.succeeded" ||
+      body?.event === "payment_intent.succeeded";
+
+    if (!isSuccess) {
       return {
         statusCode: 200,
-        body: JSON.stringify({ message: 'Ignored non-success event.' }),
+        body: JSON.stringify({ message: "Event ignored" }),
       };
     }
 
-    const token = generateToken();
-    const tokens = loadTokens();
+    // Generate a secure 8-character token
+    const token = [...Array(8)]
+      .map(() => Math.random().toString(36)[2])
+      .join("")
+      .toUpperCase();
 
-    tokens.push(token);
-    saveTokens(tokens);
+    validTokens.add(token); // Save to in-memory token store
 
-    console.log('✅ Payment succeeded. New token:', token);
-    console.log(`🔗 Success link: /success?token=${token}`);
+    console.log("✅ Payment succeeded");
+    console.log("🔐 Generated token:", token);
+    console.log("🧠 Valid tokens list now contains:", [...validTokens]);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Token generated.', token }),
+      body: JSON.stringify({ message: "Token stored", token }),
     };
   } catch (err) {
-    console.error('❌ Failed to handle Airwallex webhook:', err);
+    console.error("❌ Failed to handle Airwallex webhook:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to handle Airwallex webhook.' }),
+      body: JSON.stringify({ error: "Failed to handle Airwallex webhook." }),
     };
   }
 };
+
+// Optional: export token store for your validate function
+exports.validTokens = validTokens;
