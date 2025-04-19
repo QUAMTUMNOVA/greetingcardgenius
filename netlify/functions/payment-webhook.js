@@ -1,45 +1,52 @@
-let validTokens = new Set(); // Temporary in-memory storage
+import { write, list } from '@netlify/blobs';
 
-exports.handler = async function (event) {
+export async function handler(event) {
   try {
     const body = JSON.parse(event.body);
+    const eventName = body.name;
 
-    // Confirm it's a successful payment
-    const isSuccess =
-      body?.name === "payment_intent.succeeded" ||
-      body?.event === "payment_intent.succeeded";
-
-    if (!isSuccess) {
+    if (eventName !== 'payment_intent.succeeded') {
       return {
-        statusCode: 200,
-        body: JSON.stringify({ message: "Event ignored" }),
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Unsupported event' }),
       };
     }
 
-    // Generate a secure 8-character token
-    const token = [...Array(8)]
-      .map(() => Math.random().toString(36)[2])
-      .join("")
-      .toUpperCase();
+    const token = generateToken(); // Simple token for access
+    console.log('✅ Payment succeeded');
+    console.log('🔐 Generated token:', token);
 
-    validTokens.add(token); // Save to in-memory token store
+    // Store the token in a Netlify Blob
+    const key = 'valid-tokens.json';
+    const existing = await list({ dir: '/', signal: AbortSignal.timeout(5000) });
+    let tokens = [];
 
-    console.log("✅ Payment succeeded");
-    console.log("🔐 Generated token:", token);
-    console.log("🧠 Valid tokens list now contains:", [...validTokens]);
+    if (existing.blobs.includes(key)) {
+      const res = await fetch(`${process.env.BLOBS_READ_URL}/valid-tokens.json`);
+      tokens = await res.json();
+    }
+
+    tokens.push(token);
+
+    await write(key, JSON.stringify(tokens), {
+      metadata: { description: 'List of valid access tokens' },
+    });
+
+    console.log('🧠 Valid tokens list now contains:', tokens);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: "Token stored", token }),
+      body: JSON.stringify({ success: true }),
     };
-  } catch (err) {
-    console.error("❌ Failed to handle Airwallex webhook:", err);
+  } catch (error) {
+    console.error('❌ Failed to handle Airwallex webhook:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to handle Airwallex webhook." }),
+      body: JSON.stringify({ error: 'Failed to handle Airwallex webhook.' }),
     };
   }
-};
+}
 
-// Optional: export token store for your validate function
-exports.validTokens = validTokens;
+function generateToken() {
+  return Math.random().toString(36).substring(2, 10).toUpperCase(); // 8-char token
+}

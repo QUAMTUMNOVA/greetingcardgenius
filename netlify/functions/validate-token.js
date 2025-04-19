@@ -1,25 +1,37 @@
-const { validTokens } = require("./payment-webhook");
+import { read } from '@netlify/blobs';
 
-exports.handler = async function (event) {
+export async function handler(event) {
   try {
-    const token = event.queryStringParameters?.token;
+    const token = event.queryStringParameters.token;
 
-    if (validTokens.has(token)) {
+    if (!token) {
       return {
-        statusCode: 200,
-        body: JSON.stringify({ valid: true }),
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Token missing' }),
+      };
+    }
+
+    const blob = await read('valid-tokens.json');
+    const tokens = blob ? JSON.parse(blob.body.toString()) : [];
+
+    const isValid = tokens.includes(token);
+
+    if (!isValid) {
+      return {
+        statusCode: 403,
+        body: JSON.stringify({ error: 'Invalid or expired access link.' }),
       };
     }
 
     return {
-      statusCode: 403,
-      body: JSON.stringify({ valid: false }),
+      statusCode: 200,
+      body: JSON.stringify({ success: true }),
     };
   } catch (err) {
-    console.error("❌ Failed to validate token:", err);
+    console.error('❌ Validation failed:', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Token validation failed" }),
+      body: JSON.stringify({ error: 'Validation failed' }),
     };
   }
-};
+}
