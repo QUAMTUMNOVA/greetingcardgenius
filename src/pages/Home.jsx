@@ -2,6 +2,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import BuyCardButton from './components/BuyCardButton';
 
 <Helmet>
   <title>Greeting Card Genius – AI-Designed Cards</title>
@@ -24,6 +25,8 @@ export default function HomePage() {
       </Helmet>
 
       <Header />
+
+      <BuyCardButton />
 
       <div className="max-w-4xl mx-auto text-center space-y-10">
         <p className="text-lg text-gray-300">
