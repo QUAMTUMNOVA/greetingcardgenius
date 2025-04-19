@@ -1,44 +1,57 @@
-// Correct CommonJS Netlify function
-exports.handler = async function (event, context) {
+const fs = require('fs');
+const path = require('path');
+
+const TOKEN_FILE = path.resolve(__dirname, 'tokens.json');
+
+// Util: generate random 6-character token
+function generateToken(length = 6) {
+  return Math.random().toString(36).substring(2, 2 + length).toUpperCase();
+}
+
+// Load existing tokens
+function loadTokens() {
   try {
-    const payload = JSON.parse(event.body);
+    const data = fs.readFileSync(TOKEN_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+}
 
-    // Get the root payment object
-    const paymentData = payload.data?.object || {};
+// Save tokens
+function saveTokens(tokens) {
+  fs.writeFileSync(TOKEN_FILE, JSON.stringify(tokens, null, 2));
+}
 
-    // Extract customer info from latest payment attempt
-    const billing = paymentData?.latest_payment_attempt?.payment_method?.card?.billing || {};
-    const fullName = `${billing.first_name || "Customer"} ${billing.last_name || ""}`.trim();
-    const email = billing.email || "no-email@example.com";
+exports.handler = async function (event) {
+  try {
+    const body = JSON.parse(event.body || '{}');
 
-    // Extract customer info from enhanced scheme data if available
-    const altName = paymentData?.additional_info?.enhanced_scheme_data?.customer?.first_name;
-    const altEmail = paymentData?.additional_info?.customer_activity_data?.linked_social_networks?.[0]?.email;
+    if (body.name !== 'payment_intent.succeeded') {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ message: 'Ignored non-success event.' }),
+      };
+    }
 
-    const finalName = altName || fullName;
-    const finalEmail = altEmail || email;
+    const token = generateToken();
+    const tokens = loadTokens();
 
-    // Link to your card or delivery
-    const cardLink = "https://greetingcardgenius.com.au/cards/sample_greeting_card.png";
+    tokens.push(token);
+    saveTokens(tokens);
 
-    // Log the delivery
-    console.log(`✅ Payment succeeded for ${finalName} <${finalEmail}>`);
-    console.log(`🎁 Delivering card: ${cardLink}`);
+    console.log('✅ Payment succeeded. New token:', token);
+    console.log(`🔗 Success link: /success?token=${token}`);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        status: "success",
-        message: `Thank you, ${finalName}! Your card is ready.`,
-        email: finalEmail,
-        download: cardLink
-      })
+      body: JSON.stringify({ message: 'Token generated.', token }),
     };
   } catch (err) {
-    console.error("❌ Webhook failed:", err);
+    console.error('❌ Failed to handle Airwallex webhook:', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to handle Airwallex webhook." })
+      body: JSON.stringify({ error: 'Failed to handle Airwallex webhook.' }),
     };
   }
 };
