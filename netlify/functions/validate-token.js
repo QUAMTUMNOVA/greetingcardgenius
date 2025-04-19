@@ -1,7 +1,6 @@
 const fs = require('fs');
-const path = require('path');
 
-const FILE_PATH = path.join(__dirname, 'valid-tokens.json');
+const FILE_PATH = '/tmp/valid-tokens.json';
 
 exports.handler = async function (event) {
   const token = event.queryStringParameters?.token;

@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const FILE_PATH = path.join(__dirname, 'valid-tokens.json');
+const FILE_PATH = '/tmp/valid-tokens.json';
 
 function generateToken() {
   return crypto.randomBytes(5).toString('base64url').toUpperCase();
