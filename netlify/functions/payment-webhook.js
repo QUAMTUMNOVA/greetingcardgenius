@@ -1,34 +1,38 @@
-const fs = require('fs');
-const path = '/tmp/valid-tokens.json';
+const { createClient } = require('@supabase/supabase-js');
 const crypto = require('crypto');
 
-function generateToken() {
-  return crypto.randomBytes(5).toString('base64url').toUpperCase();
-}
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_ANON_KEY
+);
 
-exports.handler = async function () {
+exports.handler = async function (event) {
   try {
-    let validTokens = [];
+    const token = crypto.randomBytes(5).toString('base64url').toUpperCase();
 
-    if (fs.existsSync(path)) {
-      validTokens = JSON.parse(fs.readFileSync(path, 'utf8'));
+    const { error } = await supabase
+      .from('tokens')
+      .insert([{ value: token }]);
+
+    if (error) {
+      console.error("❌ Supabase insert failed", error);
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Database insert failed" }),
+      };
     }
 
-    const token = generateToken();
-    validTokens.push(token);
-
-    fs.writeFileSync(path, JSON.stringify(validTokens));
-
     console.log("✅ Token created:", token);
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Token created', token }),
+      body: JSON.stringify({ message: "Token created", token }),
     };
   } catch (err) {
-    console.error("❌ Failed to handle webhook", err);
+    console.error("❌ Webhook error", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Webhook error' }),
+      body: JSON.stringify({ error: "Webhook error" }),
     };
   }
 };
