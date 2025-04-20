@@ -1,44 +1,45 @@
-const fetch = require('node-fetch'); // polyfill
-global.fetch = fetch;
+const https = require('https');
 
-const { createClient } = require('@supabase/supabase-js');
-const crypto = require('crypto');
+exports.handler = async function () {
+  const token = [...Array(10)].map(() => Math.random().toString(36)[2]).join('').toUpperCase();
 
-console.log("🔐 Supabase URL:", process.env.SUPABASE_URL);
-console.log("🔐 Supabase Service Role Key Present:", !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const data = JSON.stringify({ token });
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
-
-exports.handler = async function (event) {
-  try {
-    const token = crypto.randomBytes(5).toString('base64url').toUpperCase();
-
-    const { error } = await supabase
-      .from('tokens')
-      .insert([{ token }]);
-
-    if (error) {
-      console.error("❌ Supabase insert failed", error.message, error.details);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "Database insert failed", reason: error.message }),
-      };
+  const options = {
+    hostname: 'qbigiaryprmkctxaxby.supabase.co',
+    port: 443,
+    path: '/rest/v1/tokens',
+    method: 'POST',
+    headers: {
+      'apikey': process.env.SUPABASE_SERVICE_ROLE_KEY,
+      'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
     }
+  };
 
-    console.log("✅ Token created:", token);
+  return new Promise((resolve, reject) => {
+    const req = https.request(options, res => {
+      let body = '';
+      res.on('data', chunk => (body += chunk));
+      res.on('end', () => {
+        console.log("✅ Token created:", token);
+        resolve({
+          statusCode: 200,
+          body: JSON.stringify({ message: "Token created", token })
+        });
+      });
+    });
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: "Token created", token }),
-    };
-  } catch (err) {
-    console.error("❌ Webhook error", err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Webhook error", reason: err.message }),
-    };
-  }
+    req.on('error', error => {
+      console.error("❌ HTTPS insert failed", error);
+      resolve({
+        statusCode: 500,
+        body: JSON.stringify({ error: "HTTPS insert failed", reason: error.message })
+      });
+    });
+
+    req.write(data);
+    req.end();
+  });
 };
