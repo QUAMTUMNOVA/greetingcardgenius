@@ -1,30 +1,39 @@
 import { createClient } from '@supabase/supabase-js'
-import fetch from 'node-fetch'
 import crypto from 'crypto'
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-  {
-    global: { fetch } // ⬅ ensures fetch works under Netlify's DNS
-  }
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
-export const handler = async () => {
-  const token = crypto.randomBytes(5).toString('base64url').toUpperCase()
+export const handler = async function () {
+  try {
+    const token = crypto.randomBytes(5).toString('base64url').toUpperCase()
 
-  const { error } = await supabase.from('tokens').insert([{ token }])
+    console.log("🔑 Using Supabase URL:", process.env.SUPABASE_URL)
+    console.log("🔐 Service Key Present:", !!process.env.SUPABASE_SERVICE_ROLE_KEY)
 
-  if (error) {
-    console.error('❌ Supabase insert failed', error.message, error.details)
+    const { error } = await supabase.from('tokens').insert([{ token }])
+
+    if (error) {
+      console.error("❌ Supabase insert failed", error.message, error.details)
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: "Database insert failed", reason: error.message }),
+      }
+    }
+
+    console.log("✅ Token created:", token)
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "Token created", token }),
+    }
+  } catch (err) {
+    console.error("❌ Webhook error", err.message)
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Database insert failed', reason: error.message })
+      body: JSON.stringify({ error: "Webhook error", reason: err.message }),
     }
-  }
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: 'Token created', token })
   }
 }
